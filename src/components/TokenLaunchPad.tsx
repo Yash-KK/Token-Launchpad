@@ -1,54 +1,127 @@
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import {
-  TOKEN_PROGRAM_ID,
-  getMinimumBalanceForRentExemptMint,
-  MINT_SIZE,
-  createInitializeMint2Instruction,
+  TYPE_SIZE,
+  LENGTH_SIZE,
+  getMintLen,
+  ExtensionType,
+  TOKEN_2022_PROGRAM_ID,
+  createInitializeMetadataPointerInstruction,
+  createInitializeMintInstruction,
+  getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountInstruction,
+  createMintToInstruction,
 } from "@solana/spl-token";
 import {
   WalletDisconnectButton,
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
 import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
+import { createInitializeInstruction, pack } from "@solana/spl-token-metadata";
 
 const TokenLaunchPad = () => {
-  const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
+  const wallet = useWallet();
 
-  const customCreateMint = async () => {
-    if (!publicKey) {
-      console.log("connect to wallet");
+  async function customCreateMint(event: React.FormEvent<HTMLFormElement>) {
+    if (!wallet.publicKey) {
       return;
     }
-    const decimals = 9; // SHOULD BE A FIELD IN THE FORM
-    const mintAuthority = publicKey;
-    const freezeAuthority = null;
-    const keyPair = Keypair.generate(); // this is the keypair for the token's mint-address
-    const lamports = await getMinimumBalanceForRentExemptMint(connection);
+    event.preventDefault();
+
+    const mintKeypair = Keypair.generate();
+    const metadata = {
+      mint: mintKeypair.publicKey,
+      name: "YSH",
+      symbol: "Y@K",
+      uri: "https://raw.githubusercontent.com/solana-developers/opos-asset/main/assets/DeveloperPortal/metadata.json",
+      additionalMetadata: [],
+    };
+
+    const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+    const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
+
+    const lamports = await connection.getMinimumBalanceForRentExemption(
+      mintLen + metadataLen
+    );
+
     const transaction = new Transaction().add(
       SystemProgram.createAccount({
-        fromPubkey: publicKey, // one of the account's on the wallet's public key
-        newAccountPubkey: keyPair.publicKey, // public key of the new token mint addressAS5pgF1gCcx6fWZ4G42S154K4oJcmsGihujRSB8Kr93Y
-        space: MINT_SIZE,
+        fromPubkey: wallet.publicKey,
+        newAccountPubkey: mintKeypair.publicKey,
+        space: mintLen,
         lamports,
-        programId: TOKEN_PROGRAM_ID,
+        programId: TOKEN_2022_PROGRAM_ID,
       }),
-
-      createInitializeMint2Instruction(
-        keyPair.publicKey,
-        decimals,
-        mintAuthority,
-        freezeAuthority
-      )
+      createInitializeMetadataPointerInstruction(
+        mintKeypair.publicKey,
+        wallet.publicKey,
+        mintKeypair.publicKey,
+        TOKEN_2022_PROGRAM_ID
+      ),
+      createInitializeMintInstruction(
+        mintKeypair.publicKey,
+        9,
+        wallet.publicKey,
+        null,
+        TOKEN_2022_PROGRAM_ID
+      ),
+      createInitializeInstruction({
+        programId: TOKEN_2022_PROGRAM_ID,
+        mint: mintKeypair.publicKey,
+        metadata: mintKeypair.publicKey,
+        name: metadata.name,
+        symbol: metadata.symbol,
+        uri: metadata.uri,
+        mintAuthority: wallet.publicKey,
+        updateAuthority: wallet.publicKey,
+      })
     );
-    transaction.feePayer = publicKey;
+
+    transaction.feePayer = wallet.publicKey;
     transaction.recentBlockhash = (
       await connection.getLatestBlockhash()
     ).blockhash;
-    transaction.partialSign(keyPair);
-    await sendTransaction(transaction, connection);
-    console.log(`Token mint created at ${keyPair.publicKey.toBase58()}`);
-  };
+    transaction.partialSign(mintKeypair);
+
+    await wallet.sendTransaction(transaction, connection);
+
+    console.log(`Token mint created at ${mintKeypair.publicKey.toBase58()}`);
+    const associatedToken = getAssociatedTokenAddressSync(
+      mintKeypair.publicKey,
+      wallet.publicKey,
+      false,
+      TOKEN_2022_PROGRAM_ID
+    );
+
+    console.log(associatedToken.toBase58());
+
+    const transaction2 = new Transaction().add(
+      createAssociatedTokenAccountInstruction(
+        wallet.publicKey,
+        associatedToken,
+        wallet.publicKey,
+        mintKeypair.publicKey,
+        TOKEN_2022_PROGRAM_ID
+      )
+    );
+
+    await wallet.sendTransaction(transaction2, connection);
+
+    const transaction3 = new Transaction().add(
+      createMintToInstruction(
+        mintKeypair.publicKey,
+        associatedToken,
+        wallet.publicKey,
+        1000000000,
+        [],
+        TOKEN_2022_PROGRAM_ID
+      )
+    );
+
+    await wallet.sendTransaction(transaction3, connection);
+
+    console.log("Minted!");
+  }
 
   return (
     <div className="bg-gray-500 h-screen">
@@ -114,7 +187,7 @@ const TokenLaunchPad = () => {
                   />
                 </div>
               </div>
-              {publicKey ? (
+              {wallet.publicKey ? (
                 <>
                   <button
                     type="submit"
