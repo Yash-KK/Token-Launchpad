@@ -8,8 +8,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import TokenLaunchPad from "./components/TokenLaunchPad";
 
 function App() {
-  const endpoint =
-    "https://solana-devnet.g.alchemy.com/v2/RbXNp8zKVUbiRmAUWxyq8vUDlBh659Jl";
+  const endpoint = import.meta.env.VITE_API_DEVNET_URL
 
   return (
     <ConnectionProvider endpoint={endpoint}>
