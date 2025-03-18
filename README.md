@@ -1,54 +1,68 @@
-# React + TypeScript + Vite
+# 🚀 **Solana Token Launchpad**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Solana](https://img.shields.io/badge/Solana-Web3-purple?style=flat&logo=solana)  
+**Solana Token Launchpad** is a sleek and modern web3-based platform that allows users to effortlessly create and deploy SPL tokens on the **Solana blockchain**. With a minimalist dark theme, smooth animations, and a seamless user experience, this launchpad makes token creation intuitive and efficient.  
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ⚡️ **Features**
+✅ Create SPL tokens on Solana in just a few clicks.  
+✅ Connect and disconnect your wallet with **Solana Wallet Adapter**.  
+✅ Intuitive form with labels for each field and smooth hover animations.  
+✅ Web3-inspired dark UI with gradient effects and subtle animations.  
+✅ Real-time loading indicators and user-friendly toasts for better feedback.  
+✅ Built with **React, TailwindCSS, TypeScript, and Framer Motion** for smooth UX.  
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ **Tech Stack**
+- **Frontend:** React.js, TypeScript, TailwindCSS, Framer Motion  
+- **Blockchain:** Solana Web3.js, @solana/wallet-adapter  
+- **Notifications:** React Hot Toast  
+- **Styling:** TailwindCSS with responsive design  
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+---
+
+## 🔥 **Installation**
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/Yash-KK/solana-token-launchpad.git
+cd solana-token-launchpad
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+2. **Install dependencies:**
+```bash
+npm install
 ```
+
+3. **Run the development server:**
+```bash
+npm run dev
+```
+
+4. **Open the app in your browser:**
+```bash
+http://localhost:5173
+```
+
+
+
+## 🚀 **Usage**
+
+### ✅ Connect Wallet:
+- Click on the **Connect Wallet** button.  
+- Choose your Solana wallet (e.g., **Phantom**, **Solflare**).  
+
+### 🔥 Fill Token Details:
+- **Token Name:** The name of your token (e.g., `MyToken`).  
+- **Symbol:** The ticker symbol (e.g., `MTK`).  
+- **Decimals:** The number of decimal places.  
+- **Initial Supply:** The total token supply.  
+
+### 🚀 Launch Token:
+
+- Click on the **"🚀 Launch Token"** button.  
+- Wait for confirmation and view your token details.  
+
+https://github.com/user-attachments/assets/f2236801-009d-4ab3-bd90-de103f2a2ee4
