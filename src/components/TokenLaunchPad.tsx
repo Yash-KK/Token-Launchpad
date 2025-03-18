@@ -53,6 +53,11 @@ const TokenLaunchPad = () => {
       toast.error("Connect your wallet first!");
       return;
     }
+    if (!formData.tokenName || !formData.symbol || !formData.initialSupply) {
+      toast.error("Please fill in all the required fields before proceeding.");
+
+      return;
+    }
 
     setLoading(true);
 
