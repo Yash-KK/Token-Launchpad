@@ -15,24 +15,52 @@ import {
   WalletDisconnectButton,
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
-import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
 import { createInitializeInstruction, pack } from "@solana/spl-token-metadata";
+import { useState } from "react";
 
 const TokenLaunchPad = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
 
+  const [formData, setFormData] = useState({
+    tokenName: "",
+    symbol: "",
+    decimals: 0,
+    initialSupply: 0,
+  });
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+
+        if (name === "decimals") {
+      const numValue = parseInt(value, 10);
+      if (numValue < 1 || numValue > 9) {
+        alert("Decimals should be between 1 and 9");
+        return;
+      }
+    }
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
   async function customCreateMint(event: React.FormEvent<HTMLFormElement>) {
     if (!wallet.publicKey) {
       return;
     }
     event.preventDefault();
-
+    console.log(formData);
     const mintKeypair = Keypair.generate();
     const metadata = {
       mint: mintKeypair.publicKey,
-      name: "YSH",
-      symbol: "Y@K",
+      name: formData.tokenName,
+      symbol: formData.symbol,
       uri: "https://raw.githubusercontent.com/solana-developers/opos-asset/main/assets/DeveloperPortal/metadata.json",
       additionalMetadata: [],
     };
@@ -60,7 +88,7 @@ const TokenLaunchPad = () => {
       ),
       createInitializeMintInstruction(
         mintKeypair.publicKey,
-        9,
+        formData.decimals,
         wallet.publicKey,
         null,
         TOKEN_2022_PROGRAM_ID
@@ -112,7 +140,7 @@ const TokenLaunchPad = () => {
         mintKeypair.publicKey,
         associatedToken,
         wallet.publicKey,
-        1000000000,
+        formData.initialSupply * LAMPORTS_PER_SOL,
         [],
         TOKEN_2022_PROGRAM_ID
       )
@@ -144,8 +172,8 @@ const TokenLaunchPad = () => {
                   </label>
                   <input
                     type="text"
-                    name="brand"
-                    id="brand"
+                    name="tokenName"
+                    onChange={handleChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="solflow koin"
                   />
@@ -155,23 +183,23 @@ const TokenLaunchPad = () => {
                     Symbol
                   </label>
                   <input
-                    type="number"
-                    name="price"
-                    id="price"
+                    type="text"
+                    onChange={handleChange}
+                    name="symbol"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="SF"
                   />
                 </div>
                 <div className="w-full">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Image URL
+                    Decimals
                   </label>
                   <input
                     type="number"
-                    name="price"
-                    id="price"
+                    name="decimals"
+                    onChange={handleChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    placeholder="https://..."
+                    placeholder="1-9"
                   />
                 </div>
                 <div>
@@ -180,8 +208,8 @@ const TokenLaunchPad = () => {
                   </label>
                   <input
                     type="number"
-                    name="item-weight"
-                    id="item-weight"
+                    onChange={handleChange}
+                    name="initialSupply"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="100"
                   />
